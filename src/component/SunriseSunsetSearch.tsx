@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import sunIcon from '../assets/sun.svg';
 import moonIcon from '../assets/moon.svg';
 import Loaders from './Loader';
-
 import 'whatwg-fetch';
+import { format, parseISO } from 'date-fns';
 
-const OPEN_CAGE_API_KEY = process.env.OPEN_API_KEY;
+
+
+const OPEN_CAGE_API_KEY = process.env.REACT_APP_OPEN_CAGE_API_KEY
 
 interface SunriseSunsetData {
+  city: string;
   sunrise: string;
   sunset: string;
   solar_noon: string;
@@ -18,9 +21,17 @@ interface SunriseSunsetData {
   nautical_twilight_end: string;
   astronomical_twilight_begin: string;
   astronomical_twilight_end: string;
+ 
 }
 
-const SunriseSunsetSearch = () => {
+
+
+
+
+
+
+
+const SunriseSunsetSearch: React.FC = ()=> {
   const [city, setCity] = useState('');
   const [data, setData] = useState<SunriseSunsetData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,8 +53,14 @@ const SunriseSunsetSearch = () => {
     const response = await fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&formatted=0`);
     const result = await response.json();
 
-    if (result.status === 'OK') {
-      setData(result.results);
+    
+      if (result.status === 'OK') {
+        setData({
+          city: openCageResult.results[0].formatted,
+          ...result.results,
+          sunrise: format(parseISO(result.results.sunrise), "d MMM yyyy à HH:mm"),
+          sunset: format(parseISO(result.results.sunset), "d MMM yyyy à HH:mm"),
+        });
     } else {
       setData(null);
       alert('Erreur lors de la récupération des données.');
@@ -61,12 +78,12 @@ const SunriseSunsetSearch = () => {
 
   return (
     
-   
-      
+
     <div className="container mx-auto">
-      <div className="flex flex-col items-center justify-center h-screen">
-      
-        <h1 className="text-4xl font-bold text-black md:text-5xl lg:text-6xl"> Recherchez le lever et le coucher du soleil</h1>
+      <div className="flex flex-col items-center justify-center mt-28">
+     
+      <h1 className="text-6xl font-bold text-center">Sunrise Sunset</h1>
+
         <form onSubmit={handleSubmit} className="flex flex-col items-center justify-center relative">
           <input
             type="text"
@@ -89,15 +106,22 @@ const SunriseSunsetSearch = () => {
         </form>
         {loading && data === null && <Loaders />}
         {data !== null && (
+           <>
+           <p className="text-2xl font-bold text-white mt-4">{data.city}</p>
+           <div className="flex flex-wrap justify-center mt-8">
+           
+           </div>
+         
 
-  <div className="flex flex-wrap justify-center mt-8">
+          <div className="flex flex-wrap justify-center mt-8">
+            
     <div className="flex flex-col items-center justify-center mx-4">
       <div className="flex items-center justify-center w-64 h-64 bg-gray-200 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110 cursor-pointer">
         <img src={sunIcon} alt="sun" className="w-32 h-32" />
       </div>
       <div className="flex flex-col items-center justify-center mt-4">
         <p className="text-2xl font-bold text-white">Lever du soleil</p>
-        <p className="text-xl text-gray-600">{data.sunrise}</p>
+        <p className="text-xl text-white italic">{data.sunset}</p>
       </div>
     </div>
     <div className="flex flex-col items-center justify-center mx-4">
@@ -105,11 +129,15 @@ const SunriseSunsetSearch = () => {
         <img src={moonIcon} alt="moon" className="w-32 h-32" />
       </div>
       <div className="flex flex-col items-center justify-center mt-4">
-        <p className="text-2xl font-bold text-white">Coucher du soleil</p>
-        <p className="text-xl text-gray-600">{data.sunset}</p>
+                <p className="text-2xl font-bold text-white">Coucher du soleil</p>
+              
+        <p className="text-xl text-white italic">{data.sunset}</p>
+
+                
       </div>
     </div>
-  </div>
+            </div>
+            </>
 )}
 
       </div>
