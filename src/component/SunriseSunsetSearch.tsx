@@ -121,7 +121,7 @@ const SunriseSunsetSearch: React.FC = ()=> {
       </div>
       <div className="flex flex-col items-center justify-center mt-4">
         <p className="text-2xl font-bold text-white">Lever du soleil</p>
-        <p className="text-xl text-white italic">{data.sunset}</p>
+                  <p className="text-xl text-white italic">{data.sunrise}</p>
       </div>
     </div>
     <div className="flex flex-col items-center justify-center mx-4">
